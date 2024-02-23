@@ -15,4 +15,5 @@ use App\Http\Controllers\CreateExamController;
 
 Route::get('/', [CreateExamController::class, 'joinExam']);
 Route::get('/admin', [CreateExamController::class, 'createExam']);
+Route::post('/insert', [CreateExamController::class, 'insetExam']);
 // Route::get("/user",[CreateExamController::class,'user']);
