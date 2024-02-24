@@ -12,8 +12,7 @@ class Quizzes extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'file_id',
+        'test_id',
         'question',
-        'image',
     ];
 }

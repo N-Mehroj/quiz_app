@@ -1,138 +1,126 @@
 @extends('main')
 
 @section('body')
-    <h1 class="text-center font-extrabold text-3xl my-10">Create New Test{{ old('quiz') }}</h1>
-    <div class="flex justify-center items-center w-full bg-blue-500">
-        <form method="post" action="/insert"  id="quizForm" enctype="multipart/form-data">
-            @csrf
-            <div class="flex flex-col px-10 py-8  gap-10 rounded-lg">
-                <div id="quzizContainer" class="flex flex-col gap-10 quizArea">
-                    <div class="flex flex-col gap-5">
-                        <textarea name="quiz" id="" cols="100" rows="10" class="px-4 py-3 rounded-md w-full mb-5 quzzes"
-                            placeholder="Question" required></textarea>
-                        <input type="file" class="w-full bg-white py-3 px-5 rounded-lg file" name="file_1">
-                        <div class="opt_1 optionContainer flex flex-col gap-4" id="opt">
-                            <div class="flex">
-                                <input type="radio" class="w-8 mx-3 !bg-black exampleClass" name="radio_1" required>
-                                <textarea name="radio_1" id="" cols="100" rows="1" class="px-4 py-3 rounded-md" placeholder="Option"
-                                    required></textarea>
-                            </div>
-                        </div>
-                        <div class="flex justify-center mt-2">
-                            <div class="text-center text-5xl bg-orange-500 text-white rounded-md cursor-pointer px-5 pb-2"
-                                onclick="addOption()">+</div>
-                        </div>
-                    </div>
-                </div>
+    <style>
+        .question-block {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-direction: column;
+            background: rgb(61, 61, 194);
+            padding: 50px
+        }
+    </style>
+    <form method="post" id="quizForm" enctype="multipart/form-data">
+        @csrf
+        <button id="add-question-btn" class="bg-green-700 text-white px-5 py-3 rounded-md">Add Question</button>
+        <button id="add-question-btn" class="bg-sky-700 text-white px-5 py-3 rounded-md"
+            onclick="getFormData()">bajaraish</button>
+        <div id="quiz-container" class="flex justify-center gap-3 flex-col">
+        </div>
+    </form>
 
-                <div class="flex justify-center items-center text-5xl bg-teal-400 text-white rounded-md cursor-pointer pb-2"
-                    onclick="addQuiz()">+</div>
-                <button type="submit" class="bg-white px-4 py-2 rounded-md">Qo'shilish</button>
-            </div>
-        </form>
-    </div>
     <script>
-        let numForm = 1;
-
-        function addQuiz() {
-            numForm++;
-            var inputElement = document.querySelectorAll('.exampleClass');
-            var optionsContainer = document.getElementById('quzizContainer');
-            var newOptionDiv = document.createElement('div');
-            var classEle = document.getElementById('opt');
-            console.log(inputElement);
-            // console.log();
-            var lastRadio = inputElement[inputElement.length - 1];
-            var inputName = lastRadio.getAttribute('name') + '_' + numForm;
-            var getClass = classEle.classList.value.split(' ')[0] + '_' + numForm;
-            // console.log(getClass.value.split(' ')[0]);
-            var fileElement = document.querySelectorAll('.file');
-            var lastfile = fileElement[fileElement.length - 1];
-            var inputFile = lastfile.getAttribute('name') + '_' + numForm;
-            console.log(inputFile);
-
-            newOptionDiv.className = 'flex flex-col gap-5';
-            newOptionDiv.innerHTML = `
-                  <textarea name="quiz" id="" cols="100" rows="10" class="px-4 py-3 rounded-md w-full mb-5  quzzes" placeholder="Question" required></textarea>
-                  <input type="file" class="w-full bg-white py-3 px-5 rounded-lg" name="${inputFile}">
-                    <div  class="${getClass} optionContainer flex flex-col gap-4">
-                        <div class="flex">
-                            <input type="radio" class="exampleClass w-8 mx-3 !bg-black" name="${inputName}" required>
-                            <textarea name="${inputName}" id="" cols="100" rows="1" class="px-4 py-3 rounded-md" placeholder="Option" required></textarea>
-                        </div>
-                    </div>
-                    <div class="flex justify-center mt-2">
-                        <div class="text-center text-5xl bg-orange-500 text-white rounded-md cursor-pointer px-5 pb-2" onclick="addOption()">+</div>
-                    </div>
-                    `;
-            optionsContainer.appendChild(newOptionDiv);
-
-            console.log('Input Name:', inputName);
-        }
-
-        function addOption() {
-            var allOptionContainers = document.querySelectorAll('.optionContainer');
-            console.log(allOptionContainers);
-            var lastOptionContainer = allOptionContainers[allOptionContainers.length - 1];
-            var inputElement = document.querySelectorAll('.exampleClass');
-            var lastRadio = inputElement[inputElement.length - 1];
-            var inputName = lastRadio.getAttribute('name');
-            console.log('Input Name:', inputName);
-            var newOptionDiv = document.createElement('div');
-            newOptionDiv.innerHTML = `
-                        <div class="flex">
-                            <input type="radio" class="exampleClass w-8 mx-3 !bg-black" name="${inputName}">
-                            <textarea name="${inputName}" id="" cols="100" rows="1" class="px-4 py-3 rounded-md" placeholder="Option"></textarea>
-                        </div>
-                        `;
-
-            lastOptionContainer.appendChild(newOptionDiv);
-        }
-
         const element = document.querySelector('form');
         element.addEventListener('submit', event => {
-            // event.preventDefault();
-            var optionContainer = document.querySelector('.quizArea');
-            var textareas = optionContainer.querySelectorAll('textarea');
-            var quzzesContainer = document.querySelectorAll('.quzzes');
-            var optContainer = document.querySelectorAll('.opt_1');
+            event.preventDefault();
+        });
+        let questionCount = 0;
 
-            var formData = [];
+        function addQuestion() {
+            questionCount++;
 
-            var form = document.getElementById('quizForm');
-            var formData = new FormData(form);
+            const container = document.getElementById('quiz-container');
 
-            var values = {};
-            formData.forEach(function(value, key) {
-                if (values[key]) {
-                    if (!Array.isArray(values[key])) {
-                        values[key] = [values[key]];
-                    }
-                    values[key].push(value);
-                } else {
-                    values[key] = value;
+            const questionBlock = document.createElement('div');
+            questionBlock.className = 'question-block';
+
+
+            const questionInput = document.createElement('input');
+            questionInput.setAttribute('type', 'text');
+            questionInput.setAttribute('name', `question${questionCount}`);
+            questionInput.setAttribute('placeholder', `Question ${questionCount}`);
+            questionInput.setAttribute('class', `border-2 rounded-md px-5 py-3`);
+            questionInput.setAttribute('required', true);
+            questionBlock.appendChild(questionInput);
+
+            for (let i = 1; i <= 4; i++) {
+                const optionInput = document.createElement('input');
+                optionInput.setAttribute('type', 'text');
+                optionInput.setAttribute('name', `option${questionCount}-${i}`);
+                optionInput.setAttribute('placeholder', `Option ${i}`);
+                optionInput.setAttribute('class', `border-2 rounded-md px-5 py-3`);
+                optionInput.setAttribute('required', true); //
+                questionBlock.appendChild(optionInput);
+            }
+
+            const quizTextArea = document.createElement('input');
+            quizTextArea.setAttribute('type', 'text');
+            quizTextArea.setAttribute('name', `answer${questionCount}`);
+            quizTextArea.setAttribute('class', `border-2 rounded-md px-5 py-3`);
+            quizTextArea.setAttribute('required', true);
+            quizTextArea.setAttribute('placeholder', `Answer for Question ${questionCount}`);
+            questionBlock.appendChild(quizTextArea);
+
+            container.appendChild(questionBlock);
+
+            // const imageInput = document.createElement('input');
+            // imageInput.setAttribute('type', 'file');
+            // imageInput.setAttribute('name', `img${questionCount}`);
+            // questionBlock.appendChild(imageInput);
+            // questionBlock.appendChild(document.createElement('br'));
+
+            // container.appendChild(questionBlock);
+        }
+
+        document.getElementById('add-question-btn').addEventListener('click', addQuestion);
+
+        function getFormData() {
+            const formData = new FormData();
+
+            const questionBlocks = document.querySelectorAll('.question-block');
+
+            questionBlocks.forEach((block, index) => {
+                const question = block.querySelector(`input[name="question${index + 1}"]`).value;
+                const options = [];
+                for (let i = 1; i <= 4; i++) {
+                    const option = block.querySelector(`input[name="option${index + 1}-${i}"]`).value;
+                    options.push(option);
                 }
+                const answer = block.querySelector(`input[name="answer${index + 1}"]`).value;
+                // const img = block.querySelector(`input[name="img${index + 1}"]`).files[0];
+
+                formData.append(`Question ${index + 1}`, question);
+                options.forEach((option, optionIndex) => {
+                    formData.append(`Option ${index + 1}-${optionIndex + 1}`, option);
+                });
+                formData.append(`Answer ${index + 1}`, answer);
+                // formData.append(`Image ${index + 1}`, img);
             });
 
-            console.log(values);
-            // fetch("http://127.0.0.1:8000/insert", {
-            //     method: "POST",
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     },
-            //     body: JSON.stringify(values)
-            // }).then(res => {
-            //     console.log("Request complete! response:", res);
-            // });
+            // Do something with formData
+            console.log([...formData.entries()]);
 
-        });
 
-        var elementss = document.querySelector('.quizArea');
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/insert', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').getAttribute(
+                'content'));
 
-        if (elementss) {
-            console.log('An element with the class exists on the page.');
-        } else {
-            console.log('No element with the class found on the page.');
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    alert(xhr.responseText);
+                    window.location.href = 'http://127.0.0.1:8000/';
+                    console.log('Response:', xhr.responseText);
+                } else {
+                    console.error('Request failed. Status:', xhr.status);
+                }
+            };
+
+            var jsonData = JSON.stringify([...formData.entries()]);
+            xhr.send(jsonData);
         }
     </script>
 @endsection

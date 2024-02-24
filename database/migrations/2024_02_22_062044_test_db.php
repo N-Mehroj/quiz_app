@@ -16,8 +16,6 @@ return new class extends Migration
             $table->string('start_date');
             $table->string('end_date')->nullable();
             $table->string('time');
-            $table->boolean('order_changing')->default(1);
-            $table->boolean('option_changing')->default(1);
             $table->integer('quiz_count')->default(1);
             $table->integer('quiz_views_count')->default(1);
             $table->string('allowed_room_id')->nullable()->default(0);

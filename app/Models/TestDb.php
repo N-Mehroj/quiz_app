@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Api\V1;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,8 +18,6 @@ class TestDb extends Model
         'start_date',
         'end_date',
         'time',
-        'order_changing',
-        'option_changing',
         'quiz_count',
         'quiz_views_count',
         'allowed_room_id'
