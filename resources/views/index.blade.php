@@ -14,7 +14,7 @@
             <div class="flex flex-col px-10 py-8 bg-blue-500 gap-10 rounded-lg">
                 {{-- <input type="text" name="name" placeholder="Your Name"  class="px-4 py-3 rounded-md" required> --}}
                 <input type="text" name="room_id" placeholder="Room Id" class="px-4 py-3 rounded-md" required>
-                <button type="submit" class="bg-white px-4 py-2 rounded-md" onclick="toggleFullScreen()">Submit</button>
+                <button type="submit" class="bg-white px-4 py-2 rounded-md">Submit</button>
             </div>
         </form>
     </div>
