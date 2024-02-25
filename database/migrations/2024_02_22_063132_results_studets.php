@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('results_studets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('userId')->constrained('users')->onDelete('cascade');
+            $table->text('userId');
             $table->foreignId('testDb_id')->constrained('testDb')->onDelete('cascade');
             $table->text('result_percentage');
             $table->timestamps();

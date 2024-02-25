@@ -16,4 +16,9 @@ class Options extends Model
         'options',
         'correct',
     ];
+    public function quiz()
+    {
+        return $this->belongsTo(TestDb::class);
+    }
 }
+

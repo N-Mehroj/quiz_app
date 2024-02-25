@@ -6,6 +6,7 @@ use App\Models\TestDb;
 use App\Models\Options;
 use Illuminate\Http\Request;
 use App\Models\Quizzes;
+use App\Models\ResultsStudets;
 use App\Models\User;
 
 class CreateExamController extends Controller
@@ -17,19 +18,19 @@ class CreateExamController extends Controller
     }
     public function createExam()
     {
-       if(session('idTest')){
-           return view('admin.create_quizzes');
-       }else{
-          return redirect()->back();
-       }
+        if (session('idTest')) {
+            return view('admin.create_quizzes');
+        } else {
+            return redirect()->back();
+        }
     }
     public function TestInfo()
     {
-       if(!session('idTest')){
-           return view('admin.testDb');
-       }else{
-         return redirect()->back();
-       }
+        if (!session('idTest')) {
+            return view('admin.testDb');
+        } else {
+            return redirect()->back();
+        }
     }
     public function createTestInfo(Request $request)
     {
@@ -114,14 +115,81 @@ class CreateExamController extends Controller
         session()->forget('idTest');
     }
 
-    public function loginQuiz(Request $request){
-         $test = TestDb::where('allowed_room_id',$request->query('room_id'))->first();
-         if(!$test){
-             return redirect()->back();
-         }else{
-            return view('quiz.quiz_area');
-            //  print_r($test[0]);
-            //  return $test;
-         }
+    public function loginQuiz(Request $request)
+    {
+        $test = TestDb::where('allowed_room_id', $request->query('room_id'))->with('result')->get();
+        if ($request->ip() == @$test[0]->result[0]['userId']) {
+            return redirect('/');
+        }
+
+        if ($test->count() != 1) {
+            return redirect()->back();
+        } else {
+            $quizzes =  Quizzes::where('test_id', $test[0]->id)
+                ->limit($test[0]->quiz_views_count)
+                ->with('options')
+                ->inRandomOrder()
+                ->get();
+            $quizlist = [];
+            foreach ($quizzes as $key => $quiz) {
+                $newItem = [
+                    'id' => $quiz['id'],
+                    'test_id' => $quiz['test_id'],
+                    'question' => $quiz['question'],
+                ];
+                $newItem['options'] = [];
+                foreach ($quiz['options'] as $option) {
+                    $newItem['options'] = [
+                        'id' => $option['id'],
+                        'quiz_id' => $option['quiz_id'],
+                        'options' => json_decode($option['options']),
+                        'correct' => $option['correct'],
+                    ];
+                }
+                $quizlist[] = $newItem;
+            }
+            return view('quiz.quiz_area', compact('quizlist', 'test'));
+        }
+    }
+
+    public function getQuizCorrect(Request $request)
+    {
+        $test = TestDb::where('allowed_room_id', $request[0]['room_id'])->first();
+        // return $test['quiz_views_count'];
+        $correctCount = 0;
+        $resault = [];
+        foreach ($request->all() as $item) {
+            foreach ($item['answer'] as $key => $ans) {
+                $quizzes =  Quizzes::where('id', $ans['id'])->with('options')->get();
+                if ($ans['vall'] == $quizzes[0]['options'][0]['correct']) {
+                    $res = [
+                        'id' => $quizzes[0]['id'],
+                        'question' => $quizzes[0]['question'],
+                        'correct' => 1,
+                    ];
+                    $resault[] = $res;
+                    $correctCount++;
+                } else {
+                    $res = [
+                        'id' => $quizzes[0]['id'],
+                        'question' => $quizzes[0]['question'],
+                        'correct' => $ans['vall'],
+                    ];
+                    $resault[] = $res;
+                }
+            }
+        }
+        usort($resault, function ($a, $b) {
+            return $a['id'] - $b['id'];
+        });
+        $resault['percent'] = ((string)($correctCount / $test['quiz_views_count']) * 100) . '%';
+        $resault['ip'] = $request->ip();
+        ResultsStudets::create([
+            'userId' => $request->ip(),
+            'testDb_id' => $test->id,
+            'result_percentage' => ((string)($correctCount / $test['quiz_views_count']) * 100) . '%',
+        ]);
+        //   return ;  
+        return view('quiz.ajax', compact('resault'));
     }
 }

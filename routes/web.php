@@ -20,3 +20,4 @@ Route::get('/test_info', [CreateExamController::class,  'TestInfo']);
 Route::post('/test_insert', [CreateExamController::class, 'createTestInfo']);
 // Route::get("/user",[CreateExamController::class,'user']);
 Route::get("/login_quiz",[CreateExamController::class,'loginQuiz']);
+Route::post("/get_resault",[CreateExamController::class,'getQuizCorrect']);

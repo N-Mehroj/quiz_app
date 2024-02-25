@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use LDAP\Result;
 
 class TestDb extends Model
 {
@@ -22,5 +23,13 @@ class TestDb extends Model
         'quiz_views_count',
         'allowed_room_id'
     ];
+    public function quiz()
+    {
+        return $this->hasMany(Quizzes::class,'test_id', 'id');
+    }
+    public function result()
+    {
+        return $this->hasMany(ResultsStudets::class,'testDb_id', 'id');
+    }
 
 }

@@ -16,4 +16,8 @@ class ResultsStudets extends Model
         'testDb_id',
         'result_percentage',
     ];
+    public function testDb()
+    {
+        return $this->hasMany(TestDb::class);
+    }
 }

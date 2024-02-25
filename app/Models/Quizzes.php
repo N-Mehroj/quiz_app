@@ -15,4 +15,12 @@ class Quizzes extends Model
         'test_id',
         'question',
     ];
+    public function testDb()
+    {
+        return $this->belongsTo(TestDb::class);
+    }
+    public function options()
+    {
+        return $this->hasMany(Options::class,'quiz_id', 'id');
+    }
 }
