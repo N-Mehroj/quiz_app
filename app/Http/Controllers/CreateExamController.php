@@ -66,53 +66,54 @@ class CreateExamController extends Controller
     }
     public function insetExam(Request $request)
     {
-        $groupedData = [];
-        $currentQuestion = null;
+        return $request->all();
+        // $groupedData = [];
+        // $currentQuestion = null;
 
-        foreach ($request->all() as $item) {
-            $key = $item[0];
-            $value = $item[1];
+        // foreach ($request->all() as $item) {
+        //     $key = $item[0];
+        //     $value = $item[1];
 
-            if (strpos($key, 'Question') !== false) {
-                $currentQuestion = $value;
-                $groupedData[$currentQuestion] = ['Question' => $value, 'Options' => [], 'Answer' => ''];
-            } elseif (strpos($key, 'Option') !== false) {
-                $groupedData[$currentQuestion]['Options'][] = [$key => $value];
-            } elseif (strpos($key, 'Answer') !== false) {
-                $groupedData[$currentQuestion]['Answer'] = $value;
-            }
-        }
+        //     if (strpos($key, 'Question') !== false) {
+        //         $currentQuestion = $value;
+        //         $groupedData[$currentQuestion] = ['Question' => $value, 'Options' => [], 'Answer' => ''];
+        //     } elseif (strpos($key, 'Option') !== false) {
+        //         $groupedData[$currentQuestion]['Options'][] = [$key => $value];
+        //     } elseif (strpos($key, 'Answer') !== false) {
+        //         $groupedData[$currentQuestion]['Answer'] = $value;
+        //     }
+        // }
 
-        $quzz = [];
-        foreach ($groupedData as $key => $q) {
-            foreach ($q as $key => $qu) {
-                if ($key == 'Question') {
-                    $quzz[] = $qu;
-                    $quizCreate = Quizzes::create([
-                        'test_id' => session('idTest'),
-                        'question' => $qu,
-                    ]);
-                }
-                print_r($q);
-                if ($quizCreate) {
-                    if ($key == 'Options') {
-                        $vall = [];
-                        foreach ($qu as $key => $value) {
-                            foreach ($value as $key => $val) {
-                                $vall[] = $val;
-                            }
-                            $encode = json_encode($vall);
-                        }
-                        Options::create([
-                            'quiz_id' => $quizCreate->id,
-                            'options' => $encode,
-                            'correct' => $q['Answer'],
-                        ]);
-                    }
-                }
-            }
-        }
-        session()->forget('idTest');
+        // $quzz = [];
+        // foreach ($groupedData as $key => $q) {
+        //     foreach ($q as $key => $qu) {
+        //         if ($key == 'Question') {
+        //             $quzz[] = $qu;
+        //             $quizCreate = Quizzes::create([
+        //                 'test_id' => session('idTest'),
+        //                 'question' => $qu,
+        //             ]);
+        //         }
+        //         print_r($q);
+        //         if ($quizCreate) {
+        //             if ($key == 'Options') {
+        //                 $vall = [];
+        //                 foreach ($qu as $key => $value) {
+        //                     foreach ($value as $key => $val) {
+        //                         $vall[] = $val;
+        //                     }
+        //                     $encode = json_encode($vall);
+        //                 }
+        //                 Options::create([
+        //                     'quiz_id' => $quizCreate->id,
+        //                     'options' => $encode,
+        //                     'correct' => $q['Answer'],
+        //                 ]);
+        //             }
+        //         }
+        //     }
+        // }
+        // session()->forget('idTest');
     }
 
     public function loginQuiz(Request $request)
@@ -189,7 +190,7 @@ class CreateExamController extends Controller
             'testDb_id' => $test->id,
             'result_percentage' => ((string)($correctCount / $test['quiz_views_count']) * 100) . '%',
         ]);
-        //   return ;  
+        //   return ;
         return view('quiz.ajax', compact('resault'));
     }
 }

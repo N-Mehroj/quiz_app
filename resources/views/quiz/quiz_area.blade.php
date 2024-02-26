@@ -12,7 +12,6 @@
         $yearNow = (int) date('Y');
         $monthNow = (int) date('m');
         $dayNow = (int) date('d');
-
     @endphp
     <style>
         .selected {
@@ -141,7 +140,7 @@
             var sekundLeft = second % 60;
 
             document.getElementById('inner').innerText = minutLeft + ' minut ' + sekundLeft + ' seconds left'
-
+            
             second--;
             if (second < 0) {
                 clearInterval(timer);

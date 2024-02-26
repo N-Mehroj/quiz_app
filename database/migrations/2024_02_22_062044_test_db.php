@@ -12,7 +12,7 @@ return new class extends Migration
         Schema::create('testDb', function (Blueprint $table) {
             $table->id();
             $table->text('title');
-            $table->text('desc');
+            $table->text('desc')->nullable();
             $table->string('start_date');
             $table->string('end_date')->nullable();
             $table->string('time');
