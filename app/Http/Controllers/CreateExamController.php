@@ -7,6 +7,7 @@ use App\Models\Options;
 use Illuminate\Http\Request;
 use App\Models\Quizzes;
 use App\Models\ResultsStudets;
+use App\Models\ResultData;
 use App\Models\User;
 
 class CreateExamController extends Controller
@@ -66,7 +67,63 @@ class CreateExamController extends Controller
     }
     public function insetExam(Request $request)
     {
-        return $request->all();
+        // return $request->all();
+        $radioCorrectKey = [];
+        $a = 0;
+        foreach ($request->get('radio') as $key => $radio) {
+            if ($radio == 'on') {
+                $radioCorrectKey[] = $a;
+            } else {
+                $a++;
+            }
+        }
+
+        $options = [];
+        foreach ($request->get('answer') as $key => $allAnswer) {
+            $options[] = $allAnswer;
+        }
+        foreach ($radioCorrectKey as $answ) {
+            foreach ($request->get('answer') as $key => $answer) {
+                if ($answ == $key) {
+                    $correct[] = $answer;
+                }
+            }
+        }
+        $options = json_encode($options);
+        $correct = json_encode($correct);
+        $quizCreate = Quizzes::create([
+            'test_id' => session('idTest'),
+            'question' => $request->get('quiz')[0],
+            'quiz_type' => $request->get('quiz_type')[0],
+        ]);
+        if ($quizCreate) {
+            Options::create([
+                'quiz_id' => $quizCreate->id,
+                'options' => $options,
+                'correct' => $correct,
+            ]);
+        }
+        return redirect()->back();
+
+
+
+        // foreach ($ra as $getKey) {
+        //     foreach ($request->get('answer') as $key => $answer) {
+        //         if ($getKey == $key+1) {
+        //             $correct[] = $answer;
+        //         }
+        //             // $ansa[] = $answ;
+        //             // if ($answ-1 == $key) {
+        //             // }
+        //         }
+        //     }
+        //     // $correct[] = $answer.' '.$key;
+        // // }
+        // $firstElement1 = $array1[0];
+        // $firstElement2 = $array2[0];
+        // $getCorrect = [];
+
+        // return  $json;
         // $groupedData = [];
         // $currentQuestion = null;
 
@@ -185,12 +242,28 @@ class CreateExamController extends Controller
         });
         $resault['percent'] = ((string)($correctCount / $test['quiz_views_count']) * 100) . '%';
         $resault['ip'] = $request->ip();
-        ResultsStudets::create([
-            'userId' => $request->ip(),
+        $resData = ResultsStudets::create([
+            // 'userId' => $request->ip(),
+            'userId' => '120',
             'testDb_id' => $test->id,
             'result_percentage' => ((string)($correctCount / $test['quiz_views_count']) * 100) . '%',
         ]);
-        //   return ;
-        return view('quiz.ajax', compact('resault'));
+        if ($resData) {
+            $id = [];
+            foreach ($resault as $resGetData){
+                // $id[] = $res['id'];
+                // print_r($res['id'][1]);
+                ResultData::create([
+                    'quiz_id' => 1,
+                    'question' => $resGetData['question'],
+                    'option' => $resGetData['correct'],
+                ]);
+
+            }
+        }
+        // return $id;
+        // print_r($resault);
+        // return $resault;
+        // return view('quiz.ajax', compact('resault'));
     }
 }

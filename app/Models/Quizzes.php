@@ -14,6 +14,7 @@ class Quizzes extends Model
     protected $fillable = [
         'test_id',
         'question',
+        'quiz_type'
     ];
     public function testDb()
     {

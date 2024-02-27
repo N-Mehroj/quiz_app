@@ -12,6 +12,10 @@
             padding: 50px
         }
     </style>
+    <div class="flex justify-end px-10">
+        <button id="add-question-btn" class=" mt-10 bg-red-500 font-semibold  text-white px-5 py-3 rounded-md"
+            onclick="location.href = '/'">Complete the test settings</button>
+    </div>
     <form method="post" action="/insert" id="quizForm">
         @csrf
         <div id="quiz-container" class="flex items-center flex-col mt-20">
@@ -24,28 +28,36 @@
                 </div>
             </div>
             <div class="bg-blue-500 border-2 px-10 py-10 rounded-lg flex flex-col w-5/12 gap-5">
-                <input type="text" name="quiz[]" id="" class="border w-full px-3 py-2 rounded-md"
+                <input type="text" name="quiz[]" id="" class="textInput border w-full px-3 py-2 rounded-md"
                     placeholder="Quiz" required>
+                <input type="hidden" name="quiz_type" id="type" class="w-7" value="0">
                 <div class="grid grid-cols-1 gap-3 mt-2" id="opt">
                     <div class="flex gap-3 ">
-                        <input type="radio" name="radio" id="" class="w-7" required>
+                        <input type="radio" name="radio[]" id="" class="w-7" required>
+                        <input type="hidden" name="radio[]" id="" class="w-7" value="0">
+
                         <input type="text" name="answer[]" required
-                            class="border w-full px-3 py-2 rounded-md answer" placeholder="options">
+                            class="textInput border w-full px-3 py-2 rounded-md answer" placeholder="options">
                     </div>
                     <div class="flex gap-3">
-                        <input type="radio" name="radio" id="" class="w-7" required>
+                        <input type="radio" name="radio[]" id="" class="w-7" required>
+                        <input type="hidden" name="radio[]" id="" class="w-7" value="0">
+
                         <input type="text" name="answer[]" required id=""
-                            class="border w-full px-3 py-2 rounded-md answer" placeholder="options">
+                            class="textInput border w-full px-3 py-2 rounded-md answer" placeholder="options">
                     </div>
                     <div class="flex gap-3">
-                        <input type="radio" name="radio" id="" class="w-7" required>
+                        <input type="radio" name="radio[]" id="" class="w-7" required>
+                        <input type="hidden" name="radio[]" id="" class="w-7" value="0">
+
                         <input type="text" name="answer[]" required id=""
-                            class="border w-full px-3 py-2 rounded-md answer" placeholder="options">
+                            class="textInput border w-full px-3 py-2 rounded-md answer" placeholder="options">
                     </div>
                     <div class="flex gap-3">
-                        <input type="radio" name="radio" id="" class="w-7" required>
+                        <input type="radio" name="radio[]" id="" class="w-7" required>
+                        <input type="hidden" name="radio[]" id="" class="w-7" value="0">
                         <input type="text" name="answer[]" required id=""
-                            class="border w-full px-3 py-2 rounded-md answer" placeholder="options">
+                            class="textInput border w-full px-3 py-2 rounded-md answer" placeholder="options">
                     </div>
                 </div>
                 <div class="flex justify-center">
@@ -57,27 +69,29 @@
                     onclick="getFormData()">Submit</button>
             </div>
         </div>
+
     </form>
 
     <script>
-        let type = 'radio';
+        let quiztype = document.getElementById('type');
 
         function changeMultipleChoice() {
-
             const radioInputs = document.querySelectorAll('input[type="radio"]');
             radioInputs.forEach(radioInput => {
+                radioInput.required = false;
+                radioInput.value = radioInput.value;
                 radioInput.setAttribute('type', 'checkbox');
             });
-            type = 'checkbox';
+            quiztype.value = 1;
         }
 
         function changeOneChoice() {
-
             const radioInputs = document.querySelectorAll('input[type="checkbox"]');
             radioInputs.forEach(radioInput => {
                 radioInput.setAttribute('type', 'radio');
+                radioInput.setAttribute('required', 'true');
             });
-            type = 'radio';
+            quiztype.value = 0;
         }
 
         function addNewOpts() {
@@ -85,32 +99,32 @@
 
             const clonedOption = optionsContainer.lastElementChild.cloneNode(true);
 
-            clonedOption.querySelector('input[name="radio[]"]');
+            clonedOption.querySelector('input[name="radio[]"]').checked = false;
             clonedOption.querySelector('input[name="answer[]"]').value = '';
             optionsContainer.appendChild(clonedOption);
         }
         const answer = document.querySelectorAll('.answer');
 
-        answer.forEach(function(el) {
-            el.addEventListener('keyup', function(e) {
-                console.log(el.previousElementSibling);
-                console.log(el.previousElementSibling.value = el.value);
+        // answer.forEach(function(el) {
+        //     el.addEventListener('keyup', function(e) {
+        //         // console.log(el.previousElementSibling);
+        //         // console.log(el.previousElementSibling.value = el.value);
 
-            })
+        //     })
+        // });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var inputElement = document.querySelector('.textInput');
+
+            inputElement.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' && event.ctrlKey) {
+                    addNewOpts();
+                }
+            });
         });
 
 
-        // document.addEventListener('DOMContentLoaded', function() {
-        //     var inputElements = document.querySelectorAll('.toggler');
 
-        //     inputElements.forEach(function(el) {
-        //         el.addEventListener('keyup', function(el) {
-        //             // console.log(inputElement.value);
-        //             console.log(el.previousElementSibling);
-        //             // el.previousElementSibling.value = inputElement.value;
-        //         });
-        //     });
-        // });
         // const optionInput = document.createElement('input');
         // optionInput.type.forEach(element => {
 

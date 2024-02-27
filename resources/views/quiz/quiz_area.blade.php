@@ -102,7 +102,28 @@
 
         }
 
+
+        var minute = {{ $test[0]['time'] }};
+        var second = minute * 60;
+
+        var timer = setInterval(function() {
+
+            var minutLeft = Math.floor(second / 60);
+            var sekundLeft = second % 60;
+
+            document.getElementById('inner').innerText = minutLeft + ' minut ' + sekundLeft + ' seconds left'
+
+            second--;
+            if (second < 0) {
+                clearInterval(timer);
+                alert('Time is up');
+                sendData();
+            }
+        }, 1000);
+
+
         function sendData() {
+            clearInterval(timer);
             let data = {
                 'answer': qu,
                 'room_id': "{{ $test[0]['allowed_room_id'] }}",
@@ -131,24 +152,6 @@
 
 
         }
-        var minute = {{ $test[0]['time'] }};
-        var second = minute * 60;
-
-        var timer = setInterval(function() {
-
-            var minutLeft = Math.floor(second / 60);
-            var sekundLeft = second % 60;
-
-            document.getElementById('inner').innerText = minutLeft + ' minut ' + sekundLeft + ' seconds left'
-            
-            second--;
-            if (second < 0) {
-                clearInterval(timer);
-                alert('Time is up');
-                sendData();
-            }
-        }, 1000);
-
 
         function toggleFullScreen() {
           var elem = document.documentElement;
