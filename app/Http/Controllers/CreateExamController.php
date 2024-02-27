@@ -104,73 +104,6 @@ class CreateExamController extends Controller
             ]);
         }
         return redirect()->back();
-
-
-
-        // foreach ($ra as $getKey) {
-        //     foreach ($request->get('answer') as $key => $answer) {
-        //         if ($getKey == $key+1) {
-        //             $correct[] = $answer;
-        //         }
-        //             // $ansa[] = $answ;
-        //             // if ($answ-1 == $key) {
-        //             // }
-        //         }
-        //     }
-        //     // $correct[] = $answer.' '.$key;
-        // // }
-        // $firstElement1 = $array1[0];
-        // $firstElement2 = $array2[0];
-        // $getCorrect = [];
-
-        // return  $json;
-        // $groupedData = [];
-        // $currentQuestion = null;
-
-        // foreach ($request->all() as $item) {
-        //     $key = $item[0];
-        //     $value = $item[1];
-
-        //     if (strpos($key, 'Question') !== false) {
-        //         $currentQuestion = $value;
-        //         $groupedData[$currentQuestion] = ['Question' => $value, 'Options' => [], 'Answer' => ''];
-        //     } elseif (strpos($key, 'Option') !== false) {
-        //         $groupedData[$currentQuestion]['Options'][] = [$key => $value];
-        //     } elseif (strpos($key, 'Answer') !== false) {
-        //         $groupedData[$currentQuestion]['Answer'] = $value;
-        //     }
-        // }
-
-        // $quzz = [];
-        // foreach ($groupedData as $key => $q) {
-        //     foreach ($q as $key => $qu) {
-        //         if ($key == 'Question') {
-        //             $quzz[] = $qu;
-        //             $quizCreate = Quizzes::create([
-        //                 'test_id' => session('idTest'),
-        //                 'question' => $qu,
-        //             ]);
-        //         }
-        //         print_r($q);
-        //         if ($quizCreate) {
-        //             if ($key == 'Options') {
-        //                 $vall = [];
-        //                 foreach ($qu as $key => $value) {
-        //                     foreach ($value as $key => $val) {
-        //                         $vall[] = $val;
-        //                     }
-        //                     $encode = json_encode($vall);
-        //                 }
-        //                 Options::create([
-        //                     'quiz_id' => $quizCreate->id,
-        //                     'options' => $encode,
-        //                     'correct' => $q['Answer'],
-        //                 ]);
-        //             }
-        //         }
-        //     }
-        // }
-        // session()->forget('idTest');
     }
 
     public function loginQuiz(Request $request)
@@ -219,22 +152,47 @@ class CreateExamController extends Controller
         foreach ($request->all() as $item) {
             foreach ($item['answer'] as $key => $ans) {
                 $quizzes =  Quizzes::where('id', $ans['id'])->with('options')->get();
-                if ($ans['vall'] == $quizzes[0]['options'][0]['correct']) {
-                    $res = [
-                        'id' => $quizzes[0]['id'],
-                        'question' => $quizzes[0]['question'],
-                        'correct' => 1,
-                    ];
-                    $resault[] = $res;
-                    $correctCount++;
-                } else {
-                    $res = [
-                        'id' => $quizzes[0]['id'],
-                        'question' => $quizzes[0]['question'],
-                        'correct' => $ans['vall'],
-                    ];
-                    $resault[] = $res;
+                // return json_decode($quizzes[0]['options'][0]['correct']);
+                // print_r($ans['vall']);
+                print_r(json_decode($quizzes[0]['options'][0]['correct']));
+                // $res= [];
+                foreach (json_decode($quizzes[0]['options'][0]['correct']) as $key => $value) {
+                    // $res[] = $value;
+                    if ($value == $ans['vall']) {
+                        // print_r($value);
+                        $res = [
+                            'id' => $quizzes[0]['id'],
+                            'question' => $quizzes[0]['question'],
+                            'correct' => 1,
+                        ];
+                        $resault[] = $res;
+                        $correctCount++;
+                    }
+                    if($value != $ans['vall']) {
+                        $res = [
+                            'id' => $quizzes[0]['id'],
+                            'question' => $quizzes[0]['question'],
+                            'correct' => $ans['vall'],
+                        ];
+                        $resault[] = $res;
+                    }
                 }
+                // if (array_intersect($ans['vall'], json_decode($quizzes[0]['options'][0]['correct']))) {
+                //     $res = [
+                //         'id' => $quizzes[0]['id'],
+                //         'question' => $quizzes[0]['question'],
+                //         'correct' => 1,
+                //     ];
+                //     $resault[] = $res;
+                //     $correctCount++;
+                // } else {
+                //     $res = [
+                //         'id' => $quizzes[0]['id'],
+                //         'question' => $quizzes[0]['question'],
+                //         'correct' => $ans['vall'],
+                //     ];
+                //     $resault[] = $res;
+                // }
             }
         }
         usort($resault, function ($a, $b) {
@@ -246,24 +204,22 @@ class CreateExamController extends Controller
             // 'userId' => $request->ip(),
             'userId' => '120',
             'testDb_id' => $test->id,
-            'result_percentage' => ((string)($correctCount / $test['quiz_views_count']) * 100) . '%',
+            'result_percentage' => $resault['percent'],
         ]);
         if ($resData) {
             $id = [];
-            foreach ($resault as $resGetData){
+            foreach ($resault as $key => $resGetData) {
                 // $id[] = $res['id'];
-                // print_r($res['id'][1]);
-                ResultData::create([
-                    'quiz_id' => 1,
-                    'question' => $resGetData['question'],
-                    'option' => $resGetData['correct'],
-                ]);
-
+                if (gettype($key) != 'string') {
+                    ResultData::create([
+                        'quiz_id' => $resGetData['id'],
+                        'question' => $resGetData['question'],
+                        'option' => $resGetData['correct'],
+                    ]);
+                }
             }
         }
-        // return $id;
-        // print_r($resault);
-        // return $resault;
-        // return view('quiz.ajax', compact('resault'));
+
+        return view('quiz.ajax', compact('resault'));
     }
 }
