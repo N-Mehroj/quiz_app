@@ -12,8 +12,14 @@ class ResultData extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'quiz_id',
+        'result_id',
         'question',
         'option',
+        'correct_type',
     ];
+
+    public function resultsStudets()
+    {
+        return $this->belongsTo(ResultsStudets::class);
+    }
 }

@@ -9,7 +9,6 @@
 
     <div class="flex justify-center items-center h-screen w-full">
         <form method="get" action="/login_quiz">
-
             <h1 class="text-center font-extrabold text-3xl mb-5" id="inner">Join Test</h1>
             <div class="flex flex-col px-10 py-8 bg-blue-500 gap-10 rounded-lg">
                 {{-- <input type="text" name="name" placeholder="Your Name"  class="px-4 py-3 rounded-md" required> --}}

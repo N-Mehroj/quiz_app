@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Quizzes;
 use App\Models\ResultsStudets;
 use App\Models\ResultData;
-use App\Models\User;
+
 
 class CreateExamController extends Controller
 {
@@ -152,47 +152,25 @@ class CreateExamController extends Controller
         foreach ($request->all() as $item) {
             foreach ($item['answer'] as $key => $ans) {
                 $quizzes =  Quizzes::where('id', $ans['id'])->with('options')->get();
-                // return json_decode($quizzes[0]['options'][0]['correct']);
-                // print_r($ans['vall']);
-                print_r(json_decode($quizzes[0]['options'][0]['correct']));
-                // $res= [];
-                foreach (json_decode($quizzes[0]['options'][0]['correct']) as $key => $value) {
-                    // $res[] = $value;
-                    if ($value == $ans['vall']) {
-                        // print_r($value);
-                        $res = [
-                            'id' => $quizzes[0]['id'],
-                            'question' => $quizzes[0]['question'],
-                            'correct' => 1,
-                        ];
-                        $resault[] = $res;
-                        $correctCount++;
-                    }
-                    if($value != $ans['vall']) {
-                        $res = [
-                            'id' => $quizzes[0]['id'],
-                            'question' => $quizzes[0]['question'],
-                            'correct' => $ans['vall'],
-                        ];
-                        $resault[] = $res;
-                    }
+                // print_r(json_decode($quizzes[0]['options'][0]['correct']));
+                if (in_array($ans['vall'], json_decode($quizzes[0]['options'][0]['correct']))) {
+                    $res = [
+                        'id' => $quizzes[0]['id'],
+                        'question' => $quizzes[0]['question'],
+                        'correct' => $ans['vall'],
+                        'correct_class' => 1,
+                    ];
+                    $resault[] = $res;
+                    $correctCount++;
+                } elseif (!in_array($ans['vall'], json_decode($quizzes[0]['options'][0]['correct']))) {
+                    $res = [
+                        'id' => $quizzes[0]['id'],
+                        'question' => $quizzes[0]['question'],
+                        'correct' => $ans['vall'],
+                        'correct_class' => 0,
+                    ];
+                    $resault[] = $res;
                 }
-                // if (array_intersect($ans['vall'], json_decode($quizzes[0]['options'][0]['correct']))) {
-                //     $res = [
-                //         'id' => $quizzes[0]['id'],
-                //         'question' => $quizzes[0]['question'],
-                //         'correct' => 1,
-                //     ];
-                //     $resault[] = $res;
-                //     $correctCount++;
-                // } else {
-                //     $res = [
-                //         'id' => $quizzes[0]['id'],
-                //         'question' => $quizzes[0]['question'],
-                //         'correct' => $ans['vall'],
-                //     ];
-                //     $resault[] = $res;
-                // }
             }
         }
         usort($resault, function ($a, $b) {
@@ -201,8 +179,8 @@ class CreateExamController extends Controller
         $resault['percent'] = ((string)($correctCount / $test['quiz_views_count']) * 100) . '%';
         $resault['ip'] = $request->ip();
         $resData = ResultsStudets::create([
-            // 'userId' => $request->ip(),
-            'userId' => '120',
+            'userId' => $request->ip(),
+            // 'userId' => '120',
             'testDb_id' => $test->id,
             'result_percentage' => $resault['percent'],
         ]);
@@ -212,14 +190,15 @@ class CreateExamController extends Controller
                 // $id[] = $res['id'];
                 if (gettype($key) != 'string') {
                     ResultData::create([
-                        'quiz_id' => $resGetData['id'],
+                        'result_id' => $resData->id,
                         'question' => $resGetData['question'],
                         'option' => $resGetData['correct'],
+                        'correct_type' => $resGetData['correct_class'],
                     ]);
                 }
             }
         }
-
-        return view('quiz.ajax', compact('resault'));
+        $roomid = $request[0]['room_id'];
+        return view('quiz.ajax', compact('resault','roomid'));
     }
 }

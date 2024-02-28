@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CreateExamController;
+use App\Http\Controllers\ResultController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -21,3 +22,5 @@ Route::post('/test_insert', [CreateExamController::class, 'createTestInfo']);
 // Route::get("/user",[CreateExamController::class,'user']);
 Route::get("/login_quiz",[CreateExamController::class,'loginQuiz']);
 Route::post("/get_resault",[CreateExamController::class,'getQuizCorrect']);
+
+Route::get('/result/export/', [ResultController::class, 'export']);

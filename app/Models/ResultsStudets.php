@@ -20,4 +20,8 @@ class ResultsStudets extends Model
     {
         return $this->hasMany(TestDb::class);
     }
+    public function resultData()
+    {
+        return $this->hasMany(ResultData::class,'result_id', 'id');
+    }
 }
